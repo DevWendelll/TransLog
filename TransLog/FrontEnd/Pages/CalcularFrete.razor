@@ -1,0 +1,62 @@
+﻿@page "/calcularFrete"
+@using FrontEnd.Models.Request;
+@using FrontEnd.Models.Response;
+
+<h3>Calcular Frete</h3>
+
+
+<EditForm Model="_informacoesFreteRequest" OnValidSubmit="GerarValor">
+    <div class="row">
+        <div class="col-4">
+            <label>Informe a Distancia</label>
+            <InputNumber @bind-Value="_informacoesFreteRequest.Distancia" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>Informe o Peso</label>
+            <InputNumber @bind-Value="_informacoesFreteRequest.PesoCarga" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>Informe a Altura</label>
+            <InputNumber @bind-Value="_informacoesFreteRequest.Altura" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>Informe a Largura</label>
+            <InputNumber @bind-Value="_informacoesFreteRequest.Largura" class="form-control" />
+        </div>
+        <div class="col-2">
+            <button type="submit" class="btn btn-outline-primary mt-2">Gerar Valor Frete</button>
+        </div>
+    </div>
+</EditForm>
+
+@if (exibirValor)
+{
+    <p>O valor do frete é: @_informacoesFreteResponse.ValorFrete</p>
+}
+
+@code {
+    private InformacoesFreteRequest _informacoesFreteRequest { get; set; } = new();
+    private InformacoesFreteResponse _informacoesFreteResponse { get; set; } = new();
+    private bool exibirValor = false;
+    private async Task GerarValor()
+    {
+        //lembre de sempre alterar a url da api para a url, use swagger para verificar a url
+        var apiUrl = $"https://localhost:7068/Frete/obter?Distancia={_informacoesFreteRequest.Distancia}&PesoCarga={_informacoesFreteRequest.PesoCarga}&Largura={_informacoesFreteRequest.Largura}&Altura={_informacoesFreteRequest.Altura}";
+        var http = new HttpClient();
+        try
+        {
+            _informacoesFreteResponse = await http.GetFromJsonAsync<InformacoesFreteResponse>(apiUrl);
+
+
+            if (_informacoesFreteResponse.ValorFrete != 0)
+            {
+                exibirValor = true;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+}
